@@ -1,0 +1,79 @@
+name: LLVM Clang Build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      
+    - name: Set up LLVM dependencies
+      run: |
+        shopt -s expand_aliases # Active l'utilisation des alias
+        alias fetch='git fetch --all --tags && git remote update origin --prune'
+        alias pull='fetch && git pull'
+
+        pwd
+        mkdir llvm
+        pushd llvm || exit
+            git clone https://github.com/llvm/llvm-project.git
+            pushd llvm-project || exit
+                pull
+            popd || exit
+
+            if ! [ -d build ]; then
+                mkdir build
+            fi
+            if ! [ -d install ]; then
+                mkdir install
+            fi
+
+            pushd build || exit
+                cmake -G Ninja ../llvm-project/llvm \
+                    -DCMAKE_BUILD_TYPE:STRING=Release \
+                    -DLLVM_ENABLE_PROJECTS:STRING="clang;clang-tools-extra;lld;lldb" \
+                    -DLLVM_ENABLE_RUNTIMES:STRING="compiler-rt;libcxx;libcxxabi;libunwind" \
+                    -DLLVM_ENABLE_WARNINGS:BOOL=OFF -DLLVM_ENABLE_ASSERTIONS:BOOL=OFF \
+                    -DLLVM_OPTIMIZED_TABLEGEN:BOOL=ON -DLLVM_CCACHE_BUILD:BOOL=OFF \
+                    -DLLVM_ENABLE_DOXYGEN:BOOL=OFF \
+                    -DLLVM_BUILD_TESTS:BOOL=OFF \
+                    -DLIBCXX_ENABLE_INCOMPLETE_FEATURES:BOOL=ON \
+                    -DLIBCXX_HARDENING_MODE:STRING="none" \
+                    -DLIBCXX_ENABLE_MODULES:BOOL=ON \
+                    -DLIBCXX_ENABLE_STD_MODULES=ON \
+                    -DLIBCXX_INSTALL_MODULES=ON \
+                    -DLLVM_INSTALL_UTILS=ON
+                cmake --build . --parallel 4
+                cmake --install . --prefix $HOME/llvm/install
+            popd || exit
+            pushd install || exit
+              ls
+              pushd lib || exit
+                ls
+              popd || exit
+            popd || exit
+        popd || exit
+
+        export PATH=$PATH:$HOME/llvm/install/bin
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/llvm/install/lib/x86_64-unknown-linux-gnu
+
+        clang --version
+        clang++ --version
+
+    - name: Test LLVM Clang installation
+      run: |
+        clang++ -o test test.cpp
+        ./test
+
+    - name: Upload LLVM as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: llvm-clang-precompiled
+        path: $HOME/llvm/install
