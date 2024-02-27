@@ -20,13 +20,13 @@ jobs:
         sudo apt install cmake
         cmake --version
         echo "CMake installé"
-    
-    - name: Install Ninja
+        
+    - name: Build & Install Ninja
       run: |
         shopt -s expand_aliases # Active l'utilisation des alias
         alias fetch='git fetch --all --tags && git remote update origin --prune'
         alias pull='fetch && git pull'
-        
+
         git clone https://github.com/ninja-build/ninja.git
         pushd ninja || exit
           git checkout release
@@ -42,10 +42,11 @@ jobs:
           fi
           sudo cp build/ninja /usr/bin/ninja
         popd || exit
+
         ninja --version
         echo "Ninja installé"
       
-    - name: Build LLVM
+    - name: Build & Install LLVM
       run: |
         shopt -s expand_aliases # Active l'utilisation des alias
         alias fetch='git fetch --all --tags && git remote update origin --prune'
@@ -53,44 +54,42 @@ jobs:
 
         mkdir llvm
         pushd llvm || exit
-            git clone https://github.com/llvm/llvm-project.git
-            pushd llvm-project || exit
-                pull
-            popd || exit
+          git clone https://github.com/llvm/llvm-project.git
+          pushd llvm-project || exit
+            pull
+          popd || exit
 
-            if ! [ -d build ]; then
-                mkdir build
-            fi
-            if ! [ -d install ]; then
-                mkdir install
-            fi
+          if ! [ -d build ]; then
+            mkdir build
+          fi
+          if ! [ -d install ]; then
+            mkdir install
+          fi
 
-            pushd build || exit
-                cmake -G Ninja ../llvm-project/llvm \
-                    -DCMAKE_BUILD_TYPE:STRING=Release \
-                    -DLLVM_ENABLE_PROJECTS:STRING="clang;clang-tools-extra;lld;lldb" \
-                    -DLLVM_ENABLE_RUNTIMES:STRING="compiler-rt;libcxx;libcxxabi;libunwind" \
-                    -DLLVM_ENABLE_WARNINGS:BOOL=OFF -DLLVM_ENABLE_ASSERTIONS:BOOL=OFF \
-                    -DLLVM_OPTIMIZED_TABLEGEN:BOOL=ON -DLLVM_CCACHE_BUILD:BOOL=OFF \
-                    -DLLVM_ENABLE_DOXYGEN:BOOL=OFF \
-                    -DLLVM_BUILD_TESTS:BOOL=OFF \
-                    -DLIBCXX_ENABLE_INCOMPLETE_FEATURES:BOOL=ON \
-                    -DLIBCXX_HARDENING_MODE:STRING="none" \
-                    -DLIBCXX_ENABLE_MODULES:BOOL=ON \
-                    -DLIBCXX_ENABLE_STD_MODULES=ON \
-                    -DLIBCXX_INSTALL_MODULES=ON \
-                    -DLLVM_INSTALL_UTILS=ON
-                cmake --build . --parallel 4
-                cmake --install . --prefix $GITHUB_WORKSPACE/llvm/install
-            popd || exit
-            pushd install || exit
-              pwd
-              ls
-            popd || exit
+          pushd build || exit
+            cmake -G Ninja ../llvm-project/llvm \
+              -DCMAKE_BUILD_TYPE:STRING=Release \
+              -DLLVM_ENABLE_PROJECTS:STRING="clang;clang-tools-extra;lld;lldb" \
+              -DLLVM_ENABLE_RUNTIMES:STRING="compiler-rt;libcxx;libcxxabi;libunwind" \
+              -DLLVM_ENABLE_WARNINGS:BOOL=OFF -DLLVM_ENABLE_ASSERTIONS:BOOL=OFF \
+              -DLLVM_OPTIMIZED_TABLEGEN:BOOL=ON -DLLVM_CCACHE_BUILD:BOOL=OFF \
+              -DLLVM_ENABLE_DOXYGEN:BOOL=OFF \
+              -DLLVM_BUILD_TESTS:BOOL=OFF \
+              -DLIBCXX_ENABLE_INCOMPLETE_FEATURES:BOOL=ON \
+              -DLIBCXX_HARDENING_MODE:STRING="none" \
+              -DLIBCXX_ENABLE_MODULES:BOOL=ON \
+              -DLIBCXX_ENABLE_STD_MODULES=ON \
+              -DLIBCXX_INSTALL_MODULES=ON \
+              -DLLVM_INSTALL_UTILS=ON
+            cmake --build . --parallel 4
+            cmake --install . --prefix $GITHUB_WORKSPACE/llvm/install
+          popd || exit
+          pushd install || exit
+            pwd
+            ls
+          popd || exit
         popd || exit
 
-    - name: Install LLVM
-      run: |
         export PATH=$PATH:$GITHUB_WORKSPACE/llvm/install/bin
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/llvm/install/lib/x86_64-unknown-linux-gnu
 
@@ -103,7 +102,7 @@ jobs:
         ./test
 
     - name: Upload LLVM as artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: llvm-clang-precompiled
-        path: $GITHUB_WORKSPACE/llvm/install
+        path: ${{ GITHUB_WORKSPACE }}/llvm/install
