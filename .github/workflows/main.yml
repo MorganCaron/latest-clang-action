@@ -13,18 +13,20 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v2
-      
-    - name: Build LLVM
+    
+    - name: Install CMake
+      run: |
+        sudo apt-get update
+        sudo apt install cmake
+        cmake --version
+        echo "CMake installé"
+    
+    - name: Install Ninja
       run: |
         shopt -s expand_aliases # Active l'utilisation des alias
         alias fetch='git fetch --all --tags && git remote update origin --prune'
         alias pull='fetch && git pull'
-
-        pwd
-
-        sudo apt-get update
-        sudo apt install cmake
-
+        
         git clone https://github.com/ninja-build/ninja.git
         pushd ninja || exit
           git checkout release
@@ -42,6 +44,12 @@ jobs:
         popd || exit
         ninja --version
         echo "Ninja installé"
+      
+    - name: Build LLVM
+      run: |
+        shopt -s expand_aliases # Active l'utilisation des alias
+        alias fetch='git fetch --all --tags && git remote update origin --prune'
+        alias pull='fetch && git pull'
 
         mkdir llvm
         pushd llvm || exit
@@ -73,7 +81,7 @@ jobs:
                     -DLIBCXX_INSTALL_MODULES=ON \
                     -DLLVM_INSTALL_UTILS=ON
                 cmake --build . --parallel 4
-                cmake --install . --prefix $HOME/llvm/install
+                cmake --install . --prefix $GITHUB_WORKSPACE/llvm/install
             popd || exit
             pushd install || exit
               pwd
@@ -81,8 +89,10 @@ jobs:
             popd || exit
         popd || exit
 
-        export PATH=$PATH:$HOME/llvm/install/bin
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/llvm/install/lib/x86_64-unknown-linux-gnu
+    - name: Install LLVM
+      run: |
+        export PATH=$PATH:$GITHUB_WORKSPACE/llvm/install/bin
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/llvm/install/lib/x86_64-unknown-linux-gnu
 
         clang --version
         clang++ --version
@@ -96,4 +106,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: llvm-clang-precompiled
-        path: $HOME/llvm/install
+        path: $GITHUB_WORKSPACE/llvm/install
