@@ -22,6 +22,7 @@ jobs:
 
         pwd
 
+        sudo apt-get update
         sudo apt install cmake
 
         git clone https://github.com/ninja-build/ninja.git
