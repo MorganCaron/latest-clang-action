@@ -21,6 +21,27 @@ jobs:
         alias pull='fetch && git pull'
 
         pwd
+
+        sudo apt install cmake
+
+        git clone https://github.com/ninja-build/ninja.git
+        pushd ninja || exit
+          git checkout release
+          pull
+          if ! [ -d build ]; then
+            mkdir build
+          fi
+          cmake -Bbuild
+          cmake --build build
+          if ! [ -e build/ninja ]; then
+            echo "Error during Ninja installation"
+            exit 1
+          fi
+          sudo cp build/ninja /usr/bin/ninja
+        popd || exit
+        ninja --version
+        echo "Ninja installé"
+
         mkdir llvm
         pushd llvm || exit
             git clone https://github.com/llvm/llvm-project.git
