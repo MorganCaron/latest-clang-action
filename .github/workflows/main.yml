@@ -105,5 +105,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: llvm-clang-precompiled
-        path: ${{ GITHUB_WORKSPACE }}/llvm/install
+        path: ${{ github.workspace }}/llvm/install
         overwrite: true
