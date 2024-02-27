@@ -14,7 +14,7 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
       
-    - name: Set up LLVM dependencies
+    - name: Build LLVM
       run: |
         shopt -s expand_aliases # Active l'utilisation des alias
         alias fetch='git fetch --all --tags && git remote update origin --prune'
@@ -76,10 +76,8 @@ jobs:
                 cmake --install . --prefix $HOME/llvm/install
             popd || exit
             pushd install || exit
+              pwd
               ls
-              pushd lib || exit
-                ls
-              popd || exit
             popd || exit
         popd || exit
 
