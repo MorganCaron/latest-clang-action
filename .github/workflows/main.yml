@@ -80,7 +80,7 @@ jobs:
               -DLIBCXX_ENABLE_MODULES:BOOL=ON \
               -DLIBCXX_ENABLE_STD_MODULES=ON \
               -DLIBCXX_INSTALL_MODULES=ON \
-              -DLLVM_INSTALL_UTILS=ON
+              -DLLVM_INSTALL_UTILS=OFF
             cmake --build . --parallel 4
             cmake --install . --prefix $GITHUB_WORKSPACE/llvm/install
           popd || exit
