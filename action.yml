@@ -17,7 +17,6 @@ runs:
       uses: actions/download-artifact@v4
       with:
         name: llvm-clang-precompiled
-        path: llvm-clang-precompiled.zip
 
     - name: Unzip LLVM Clang
       shell: bash
