@@ -1,0 +1,37 @@
+name: 'Clang Precompiled Action'
+description: 'Action to install precompiled LLVM Clang'
+author: 'MorganCaron'
+
+branding:
+  icon: 'package'
+  color: 'blue'
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download LLVM Clang
+      uses: actions/download-artifact@v4
+      with:
+        name: llvm-clang-precompiled
+        path: llvm-clang-precompiled.zip
+
+    - name: Unzip LLVM Clang
+      shell: bash
+      run: |
+        unzip llvm-clang-precompiled.zip -d llvm
+
+    - name: Set LLVM Clang Path
+      shell: bash
+      run: |
+        echo "::add-path::${GITHUB_WORKSPACE}/llvm/install/bin"
+        echo "::add-path::${GITHUB_WORKSPACE}/llvm/install/lib/x86_64-unknown-linux-gnu"
+
+    - name: Verify LLVM Clang Installation
+      shell: bash
+      run: |
+        clang --version
+        clang++ --version
