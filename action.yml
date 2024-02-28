@@ -3,7 +3,7 @@ description: 'Action to install precompiled LLVM Clang'
 author: 'MorganCaron'
 
 branding:
-  icon: 'package'
+  icon: 'download-cloud'
   color: 'blue'
 
 runs:
