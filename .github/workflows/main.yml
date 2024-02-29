@@ -108,3 +108,4 @@ jobs:
         path: ${{ github.workspace }}/llvm/install
         if-no-files-found: error
         overwrite: true
+        compression-level: 9
