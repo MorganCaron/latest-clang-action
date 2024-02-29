@@ -17,6 +17,7 @@ runs:
       uses: actions/download-artifact@v4
       with:
         name: llvm-clang-precompiled
+        repository: MorganCaron/clang-precompiled-action
 
     - name: Unzip LLVM Clang
       shell: bash
