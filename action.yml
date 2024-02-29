@@ -20,6 +20,7 @@ runs:
         workflow_conclusion: success
         name: llvm-clang-precompiled
         repo: MorganCaron/clang-precompiled-action
+        path: llvm/
         check_artifacts: true
         search_artifacts: true
         allow_forks: false
