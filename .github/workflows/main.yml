@@ -106,4 +106,5 @@ jobs:
       with:
         name: llvm-clang-precompiled
         path: ${{ github.workspace }}/llvm/install
+        if-no-files-found: error
         overwrite: true

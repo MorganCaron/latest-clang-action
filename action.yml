@@ -14,15 +14,15 @@ runs:
       uses: actions/checkout@v4
 
     - name: Download LLVM Clang
-      uses: actions/download-artifact@v4
+      uses: dawidd6/action-download-artifact@v3
       with:
+        workflow: main.yml
+        workflow_conclusion: success
         name: llvm-clang-precompiled
-        repository: MorganCaron/clang-precompiled-action
-
-    - name: Unzip LLVM Clang
-      shell: bash
-      run: |
-        unzip llvm-clang-precompiled.zip -d llvm
+        repo: MorganCaron/clang-precompiled-action
+        check_artifacts: true
+        search_artifacts: true
+        allow_forks: false
 
     - name: Set LLVM Clang Path
       shell: bash
