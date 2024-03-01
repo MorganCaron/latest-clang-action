@@ -28,8 +28,11 @@ runs:
     - name: Adding Clang to Path
       shell: bash
       run: |
-        export PATH=$PATH:$GITHUB_WORKSPACE/llvm/install/bin
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/llvm/install/lib/x86_64-unknown-linux-gnu
+        chmod -R 755 llvm/
+        export PATH=$PATH:$GITHUB_WORKSPACE/llvm/bin
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/llvm/lib/x86_64-unknown-linux-gnu
+        sudo update-alternatives --install /usr/bin/clang clang $GITHUB_WORKSPACE/llvm/bin/clang 1000
+        sudo update-alternatives --install /usr/bin/clang++ clang++ $GITHUB_WORKSPACE/llvm/bin/clang++ 1000
 
     - name: Verify Clang Installation
       shell: bash
