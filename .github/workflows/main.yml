@@ -1,4 +1,4 @@
-name: LLVM Clang Build
+name: Build LLVM Clang
 
 on:
   push:
@@ -104,7 +104,7 @@ jobs:
     - name: Upload LLVM as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: llvm-clang-precompiled
+        name: llvm-clang
         path: ${{ github.workspace }}/llvm/install
         if-no-files-found: error
         overwrite: true

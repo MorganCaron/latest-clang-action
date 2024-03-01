@@ -1,5 +1,5 @@
-name: 'Clang Precompiled Action'
-description: 'Action to install precompiled LLVM Clang'
+name: 'Install Latest Clang'
+description: 'Action to install latest Clang'
 author: 'MorganCaron'
 
 branding:
@@ -18,20 +18,20 @@ runs:
       with:
         workflow: main.yml
         workflow_conclusion: success
-        name: llvm-clang-precompiled
-        repo: MorganCaron/clang-precompiled-action
+        name: llvm-clang
+        repo: MorganCaron/latest-clang-action
         path: llvm/
         check_artifacts: true
         search_artifacts: true
         allow_forks: false
 
-    - name: LLVM Clang Path
+    - name: Adding Clang to Path
       shell: bash
       run: |
         export PATH=$PATH:$GITHUB_WORKSPACE/llvm/install/bin
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/llvm/install/lib/x86_64-unknown-linux-gnu
 
-    - name: Verify LLVM Clang Installation
+    - name: Verify Clang Installation
       shell: bash
       run: |
         clang --version
