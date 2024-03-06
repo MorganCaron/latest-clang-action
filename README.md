@@ -18,18 +18,44 @@ on: [ push, pull_request ]
 
 jobs:
   build:
-    name: "Clang"
+    name: "Latest Clang"
     steps:
     - uses: actions/checkout@v4
     - uses: MorganCaron/latest-clang-action@master
+
     - name: Compile
-      env:
-        CC: "clang"
-        CXX: "clang++"
       run: |
         clang++ -o test test.cpp
-        ./test
+
     - name: Run
+      env:
+        LD_LIBRARY_PATH: ${{ github.workspace }}/llvm/lib/x86_64-unknown-linux-gnu
       run: |
         ./test
+```
+
+Or with [XMake](https://xmake.io/):
+```yml
+name: "Build with latest Clang"
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    name: "XMake + Latest Clang"
+    steps:
+    - uses: actions/checkout@v4
+    - uses: MorganCaron/latest-clang-action@master
+    - uses: xmake-io/github-action-setup-xmake@v1
+
+    - name: Compile
+      run: |
+        xmake f --toolchain=llvm --sdk=llvm/
+        xmake build -vD
+
+    - name: Run
+      env:
+        LD_LIBRARY_PATH: ${{ github.workspace }}/llvm/lib/x86_64-unknown-linux-gnu
+      run: |
+        xmake run
 ```
