@@ -28,8 +28,6 @@ jobs:
         clang++ -o test test.cpp
 
     - name: Run
-      env:
-        LD_LIBRARY_PATH: ${{ github.workspace }}/llvm/lib/x86_64-unknown-linux-gnu
       run: |
         ./test
 ```
@@ -54,8 +52,6 @@ jobs:
         xmake build -vD
 
     - name: Run
-      env:
-        LD_LIBRARY_PATH: ${{ github.workspace }}/llvm/lib/x86_64-unknown-linux-gnu
       run: |
         xmake run
 ```
